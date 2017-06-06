@@ -183,13 +183,15 @@ public class LauncherStateTransitionAnimation {
         if (toWorkspaceState != Workspace.State.NORMAL &&
                 toWorkspaceState != Workspace.State.SPRING_LOADED &&
                 toWorkspaceState != Workspace.State.OVERVIEW) {
-            Log.e(TAG, "Unexpected call to startAnimationToWorkspace");
+            Log.e("TAOQI", "LSTA Unexpected call to startAnimationToWorkspace");
         }
 
         if (fromState == Launcher.State.APPS || fromState == Launcher.State.APPS_SPRING_LOADED) {
+            Log.i("TAOQI", "LSTA startAnimationToWorkspaceFromAllApps");
             startAnimationToWorkspaceFromAllApps(fromWorkspaceState, toWorkspaceState, toWorkspacePage,
                     animated, onCompleteRunnable);
         } else {
+            Log.i("TAOQI", "LSTA startAnimationToWorkspaceFromWidgets");
             startAnimationToWorkspaceFromWidgets(fromWorkspaceState, toWorkspaceState, toWorkspacePage,
                     animated, onCompleteRunnable);
         }
@@ -477,6 +479,7 @@ public class LauncherStateTransitionAnimation {
 
     /**
      * Creates and starts a new animation to the workspace.
+     * contentView是展示小部件的view
      */
     private AnimatorSet startAnimationToWorkspaceFromOverlay(final Workspace.State fromWorkspaceState,
             final Workspace.State toWorkspaceState, final int toWorkspacePage, final View buttonView,

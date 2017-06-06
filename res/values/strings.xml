@@ -262,4 +262,6 @@
     <string name="widget_resized">Widget resized to width <xliff:g id="number" example="2">%1$s</xliff:g> height <xliff:g id="number" example="1">%2$s</xliff:g></string>
 
     <string name="rgk_launcher">RLauncher</string>
+
+    <string name="single_layout_mode">Single Layout Mode</string>
 </resources>

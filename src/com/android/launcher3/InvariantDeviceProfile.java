@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -117,7 +118,8 @@ public class InvariantDeviceProfile {
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    InvariantDeviceProfile(Context context) {
+    InvariantDeviceProfile(Context context, String s) {
+        Log.i("TAOQI", "IDP s = " + s);
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         DisplayMetrics dm = new DisplayMetrics();
@@ -131,6 +133,7 @@ public class InvariantDeviceProfile {
         minWidthDps = Utilities.dpiFromPx(Math.min(smallestSize.x, smallestSize.y), dm);
         minHeightDps = Utilities.dpiFromPx(Math.min(largestSize.x, largestSize.y), dm);
 
+        //加载默认布局default_worakspace_4x4
         ArrayList<InvariantDeviceProfile> closestProfiles =
                 findClosestDeviceProfiles(minWidthDps, minHeightDps, getPredefinedDeviceProfiles());
         InvariantDeviceProfile interpolatedDeviceProfileOut =

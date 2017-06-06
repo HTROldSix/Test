@@ -129,6 +129,7 @@ public class LauncherSettings {
     public static final class Favorites implements BaseLauncherColumns {
 
         public static final String TABLE_NAME = "favorites";
+        public static final String SINGLE_LAYOUT_TABLE_NAME = "single_favorites";
 
         /**
          * The content:// style URL for this table

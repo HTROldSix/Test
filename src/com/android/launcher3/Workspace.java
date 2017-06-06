@@ -2108,6 +2108,8 @@ public class Workspace extends PagedView
 
         // Update the current state
         mState = toState;
+        Log.i("TAOQI","W mState = " + mState);
+        setInOverviewMode(mState == State.OVERVIEW);
         updateAccessibilityFlags();
 
         return workspaceAnim;

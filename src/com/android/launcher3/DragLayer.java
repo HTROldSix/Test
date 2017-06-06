@@ -33,6 +33,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -253,7 +254,8 @@ public class DragLayer extends InsettableFrameLayout {
             mTouchCompleteListener = null;
         }
         clearAllResizeFrames();
-        return mDragController.onInterceptTouchEvent(ev);
+        boolean b = mDragController.onInterceptTouchEvent(ev);
+        return b;
     }
 
     @Override

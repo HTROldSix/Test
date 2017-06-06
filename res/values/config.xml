@@ -103,4 +103,7 @@
     
     <!-- Unread support -->
     <bool name="config_unreadSupport">true</bool>
+
+    <!-- 单双层切换 -->
+    <bool name="single_display">false</bool>
 </resources>

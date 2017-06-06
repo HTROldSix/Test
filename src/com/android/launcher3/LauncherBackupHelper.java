@@ -344,7 +344,7 @@ public class LauncherBackupHelper implements BackupHelper {
         if (mDeviceProfileData == null) {
             // This call does not happen on a looper thread. So LauncherAppState
             // can't be created . Instead initialize required dependencies directly.
-            mIdp = new InvariantDeviceProfile(mContext);
+            mIdp = new InvariantDeviceProfile(mContext, "LBH restoreEntity");
             mDeviceProfileData = initDeviceProfileData(mIdp);
             mIconCache = new IconCache(mContext, mIdp);
         }

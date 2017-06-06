@@ -44,7 +44,8 @@ public class LauncherAppState {
 
     private final AppFilter mAppFilter;
     private final BuildInfo mBuildInfo;
-    @Thunk final LauncherModel mModel;
+    @Thunk
+    final LauncherModel mModel;
     private final IconCache mIconCache;
     private final WidgetPreviewLoader mWidgetCache;
 
@@ -94,7 +95,7 @@ public class LauncherAppState {
             MemoryTracker.startTrackingMe(sContext, "L");
         }
 
-        mInvariantDeviceProfile = new InvariantDeviceProfile(sContext);
+        mInvariantDeviceProfile = new InvariantDeviceProfile(sContext, "LAS new LauncherAppState()");
         mIconCache = new IconCache(sContext, mInvariantDeviceProfile);
         mWidgetCache = new WidgetPreviewLoader(sContext, mIconCache);
 
@@ -112,6 +113,7 @@ public class LauncherAppState {
         filter.addAction(LauncherAppsCompat.ACTION_MANAGED_PROFILE_ADDED);
         filter.addAction(LauncherAppsCompat.ACTION_MANAGED_PROFILE_REMOVED);
 
+        filter.addAction(LauncherAppsCompat.ACTION_LAYOUT_MODE);
         if (LauncherLog.DEBUG) {
             LauncherLog.d(TAG, "LauncherAppState: mIconCache = " + mIconCache + ", mModel = "
                     + mModel + ", this = " + this);
@@ -151,7 +153,7 @@ public class LauncherAppState {
         getLauncherProvider().setLauncherProviderChangeListener(launcher);
         mModel.initialize(launcher);
         mAccessibilityDelegate = ((launcher != null) && Utilities.ATLEAST_LOLLIPOP) ?
-            new LauncherAccessibilityDelegate(launcher) : null;
+                new LauncherAccessibilityDelegate(launcher) : null;
         return mModel;
     }
 
@@ -182,7 +184,7 @@ public class LauncherAppState {
     public WidgetPreviewLoader getWidgetCache() {
         return mWidgetCache;
     }
-    
+
     public void onWallpaperChanged() {
         mWallpaperChangedSinceLastCheck = true;
     }
@@ -205,9 +207,16 @@ public class LauncherAppState {
         return mPowerManager;
     }
 
+    public static boolean isDisableAllApps;
+    //M SS-TQ{
+    public static boolean isDisableAllApps() {
+        return isDisableAllApps;
+    }
+    //}
+
     ///M: ALPS02275072, Add this function for refersh InvariantDeviceProfile
     public void RenewInvariantDeviceProfile() {
-        mInvariantDeviceProfile = new InvariantDeviceProfile(sContext);
+        mInvariantDeviceProfile = new InvariantDeviceProfile(sContext, "LAS RenewInvariantDeviceProfile");
     }
     ///M.
 }

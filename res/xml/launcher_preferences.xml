@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2015 Google Inc.
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2015 Google Inc.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -17,10 +16,16 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
-            android:key="pref_allowRotation"
-            android:title="@string/allow_rotation_title"
-            android:defaultValue="@bool/allow_rotation"
-            android:persistent="true"
-    />
+        android:defaultValue="@bool/allow_rotation"
+        android:key="pref_allowRotation"
+        android:persistent="true"
+        android:title="@string/allow_rotation_title" />
+
+    <SwitchPreference
+        android:defaultValue="@bool/allow_rotation"
+        android:key="pref_singleLayout"
+        android:persistent="true"
+        android:title="@string/single_layout_mode" />
+
 
 </PreferenceScreen>

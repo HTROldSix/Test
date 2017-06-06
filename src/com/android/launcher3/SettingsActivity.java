@@ -17,6 +17,7 @@
 package com.android.launcher3;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -49,7 +50,10 @@ public class SettingsActivity extends Activity {
 
             SwitchPreference pref = (SwitchPreference) findPreference(
                     Utilities.ALLOW_ROTATION_PREFERENCE_KEY);
+            SwitchPreference prefSingleLayout = (SwitchPreference) findPreference(
+                    Utilities.SINGLE_LAYOUT_PREFERENCE_KEY);
             pref.setPersistent(false);
+            prefSingleLayout.setPersistent(false);
 
             Bundle extras = new Bundle();
             extras.putBoolean(LauncherSettings.Settings.EXTRA_DEFAULT_VALUE, false);
@@ -57,9 +61,15 @@ public class SettingsActivity extends Activity {
                     LauncherSettings.Settings.CONTENT_URI,
                     LauncherSettings.Settings.METHOD_GET_BOOLEAN,
                     Utilities.ALLOW_ROTATION_PREFERENCE_KEY, extras);
+            Bundle valueSingleLayout = getActivity().getContentResolver().call(
+                    LauncherSettings.Settings.CONTENT_URI,
+                    LauncherSettings.Settings.METHOD_GET_BOOLEAN,
+                    Utilities.SINGLE_LAYOUT_PREFERENCE_KEY, extras);
             pref.setChecked(value.getBoolean(LauncherSettings.Settings.EXTRA_VALUE));
+            prefSingleLayout.setChecked(valueSingleLayout.getBoolean(LauncherSettings.Settings.EXTRA_VALUE));
 
             pref.setOnPreferenceChangeListener(this);
+            prefSingleLayout.setOnPreferenceChangeListener(this);
         }
 
         @Override
@@ -70,6 +80,11 @@ public class SettingsActivity extends Activity {
                     LauncherSettings.Settings.CONTENT_URI,
                     LauncherSettings.Settings.METHOD_SET_BOOLEAN,
                     preference.getKey(), extras);
+            if(preference.getKey().equals(Utilities.SINGLE_LAYOUT_PREFERENCE_KEY)){
+                Intent it = new Intent("android.intent.action.ACTION_LAYOUT_MODE");
+                it.putExtra("singleLayoutMode",(Boolean) newValue);
+                getActivity().sendBroadcast(it);
+            }
             return true;
         }
     }

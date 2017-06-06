@@ -34,7 +34,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 public class Hotseat extends FrameLayout
-        implements Stats.LaunchSourceProvider{
+        implements Stats.LaunchSourceProvider {
     private static final String TAG = "Hotseat";
 
     private CellLayout mContent;
@@ -77,7 +77,7 @@ public class Hotseat extends FrameLayout
     public void setOnLongClickListener(OnLongClickListener l) {
         mContent.setOnLongClickListener(l);
     }
-  
+
     /* Get the orientation invariant order of the item in the hotseat for persistence. */
     int getOrderInHotseat(int x, int y) {
         return mHasVerticalHotseat ? (mContent.getCountY() - y - 1) : x;
@@ -143,9 +143,14 @@ public class Hotseat extends FrameLayout
         // the hotseat in order regardless of which orientation they were added
         int x = getCellXFromOrder(mAllAppsButtonRank);
         int y = getCellYFromOrder(mAllAppsButtonRank);
-        CellLayout.LayoutParams lp = new CellLayout.LayoutParams(x,y,1,1);
+        CellLayout.LayoutParams lp = new CellLayout.LayoutParams(x, y, 1, 1);
         lp.canReorder = false;
-        mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);
+        //M SS-TQ{
+        //mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);
+        if (!LauncherAppState.isDisableAllApps()) {
+            mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);
+        }
+        //}
     }
 
     @Override

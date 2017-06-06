@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 
@@ -54,11 +55,14 @@ public class DeleteDropTarget extends ButtonDropTarget {
 
     @Override
     protected boolean supportsDrop(DragSource source, Object info) {
-        return source.supportsDeleteDropTarget() && supportsDrop(info);
+        boolean b = source.supportsDeleteDropTarget() && supportsDrop(info);
+        Log.i("TAOQI","DDT b = " + b);
+        return !LauncherAppState.isDisableAllApps();
     }
 
     @Override
-    @Thunk void completeDrop(DragObject d) {
+    @Thunk
+    void completeDrop(DragObject d) {
         ItemInfo item = (ItemInfo) d.dragInfo;
         if ((d.dragSource instanceof Workspace) || (d.dragSource instanceof Folder)) {
             removeWorkspaceOrFolderItem(mLauncher, item, null);
@@ -67,6 +71,7 @@ public class DeleteDropTarget extends ButtonDropTarget {
 
     /**
      * Removes the item from the workspace. If the view is not null, it also removes the view.
+     *
      * @return true if the item was removed.
      */
     public static boolean removeWorkspaceOrFolderItem(Launcher launcher, ItemInfo item, View view) {
@@ -90,7 +95,7 @@ public class DeleteDropTarget extends ButtonDropTarget {
                 // Deleting an app widget ID is a void call but writes to disk before returning
                 // to the caller...
                 new AsyncTask<Void, Void, Void>() {
-                    public Void doInBackground(Void ... args) {
+                    public Void doInBackground(Void... args) {
                         appWidgetHost.deleteAppWidgetId(widget.appWidgetId);
                         return null;
                     }
@@ -117,7 +122,7 @@ public class DeleteDropTarget extends ButtonDropTarget {
         FlingAnimation fling = new FlingAnimation(d, vel,
                 getIconRect(d.dragView.getMeasuredWidth(), d.dragView.getMeasuredHeight(),
                         mDrawable.getIntrinsicWidth(), mDrawable.getIntrinsicHeight()),
-                        dragLayer);
+                dragLayer);
 
         final int duration = fling.getDuration();
         final long startTime = AnimationUtils.currentAnimationTimeMillis();
