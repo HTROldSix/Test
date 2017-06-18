@@ -140,6 +140,7 @@ public class InvariantDeviceProfile {
                 invDistWeightedInterpolate(minWidthDps,  minHeightDps, closestProfiles);
 
         InvariantDeviceProfile closestProfile = closestProfiles.get(0);
+        Log.i("TAOQI","IDP " + closestProfile.minWidthDps + " " + closestProfile.minHeightDps + " " + minWidthDps + " " + minHeightDps);
         numRows = closestProfile.numRows;
         numColumns = closestProfile.numColumns;
         numHotseatIcons = closestProfile.numHotseatIcons;
@@ -173,6 +174,7 @@ public class InvariantDeviceProfile {
     }
 
     ArrayList<InvariantDeviceProfile> getPredefinedDeviceProfiles() {
+        Log.i("TAOQI", "TOP getPredefinedDeviceProfiles");
         ArrayList<InvariantDeviceProfile> predefinedDeviceProfiles = new ArrayList<>();
         // width, height, #rows, #columns, #folder rows, #folder columns,
         // iconSize, iconTextSize, #hotseat, #hotseatIconSize, defaultLayoutId.
@@ -185,11 +187,11 @@ public class InvariantDeviceProfile {
         predefinedDeviceProfiles.add(new InvariantDeviceProfile("Stubby",
                 255, 450,     3, 4, 3, 4, 4, 48, 13, 5, 48, R.xml.default_workspace_4x4));
         predefinedDeviceProfiles.add(new InvariantDeviceProfile("Nexus S",
-                296, 491.33f, 4, 4, 4, 4, 4, 48, 13, 5, 48, R.xml.default_workspace_4x4));
+                296, 491.33f, 5, 4, 4, 4, 4, 48, 13, 5, 48, R.xml.default_workspace_4x5));
         predefinedDeviceProfiles.add(new InvariantDeviceProfile("Nexus 4",
-                335, 567,     4, 4, 4, 4, 4, DEFAULT_ICON_SIZE_DP, 13, 5, 56, R.xml.default_workspace_4x4));
+                335, 567,     5, 4, 4, 4, 4, DEFAULT_ICON_SIZE_DP, 13, 5, 56, R.xml.default_workspace_4x5));
         predefinedDeviceProfiles.add(new InvariantDeviceProfile("Nexus 5",
-                359, 567,     4, 4, 4, 4, 4, DEFAULT_ICON_SIZE_DP, 13, 5, 56, R.xml.default_workspace_4x4));
+                359, 567,     5, 4, 4, 4, 4, DEFAULT_ICON_SIZE_DP, 13, 5, 56, R.xml.default_workspace_4x5));
         predefinedDeviceProfiles.add(new InvariantDeviceProfile("Large Phone",
                 406, 694,     5, 5, 4, 4, 4, 64, 14.4f,  5, 56, R.xml.default_workspace_5x5));
         // The tablet profile is odd in that the landscape orientation
@@ -248,13 +250,14 @@ public class InvariantDeviceProfile {
      * Returns the closest device profiles ordered by closeness to the specified width and height
      */
     // Package private visibility for testing.
-    ArrayList<InvariantDeviceProfile> findClosestDeviceProfiles(
+    ArrayList<InvariantDeviceProfile>  findClosestDeviceProfiles(
             final float width, final float height, ArrayList<InvariantDeviceProfile> points) {
 
         // Sort the profiles by their closeness to the dimensions
         ArrayList<InvariantDeviceProfile> pointsByNearness = points;
         Collections.sort(pointsByNearness, new Comparator<InvariantDeviceProfile>() {
             public int compare(InvariantDeviceProfile a, InvariantDeviceProfile b) {
+                Log.i("TAOQI","IDP " + a.minWidthDps + " " + a.minHeightDps + " " + b.minWidthDps + " " + b.minHeightDps + " " + width + " " + height);
                 return (int) (dist(width, height, a.minWidthDps, a.minHeightDps)
                         - dist(width, height, b.minWidthDps, b.minHeightDps));
             }

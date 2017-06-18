@@ -504,7 +504,7 @@ public class LauncherProvider extends ContentProvider {
     }
 
     private DefaultLayoutParser getDefaultLayoutParser() {
-        Log.i("TAOQI", "LP getDefaultLayoutParser()");
+        Log.i("TAOQI", "LP 获取默认布局的xml文件id，创建一个DefaultLayoutParser对象");
         int defaultLayout = LauncherAppState.getInstance()
                 .getInvariantDeviceProfile().defaultLayoutId;
         return new DefaultLayoutParser(getContext(), mOpenHelper.mAppWidgetHost,
@@ -1190,6 +1190,7 @@ public class LauncherProvider extends ContentProvider {
         int loadFavorites(SQLiteDatabase db, AutoInstallsLayout loader) {
             ArrayList<Long> screenIds = new ArrayList<Long>();
             // TODO: Use multiple loaders with fall-back and transaction.
+            //这里加载默认布局至数据库
             int count = loader.loadLayout(db, screenIds);
 
             // Add the screens specified by the items above
@@ -1200,7 +1201,7 @@ public class LauncherProvider extends ContentProvider {
                 values.clear();
                 values.put(LauncherSettings.WorkspaceScreens._ID, id);
                 values.put(LauncherSettings.WorkspaceScreens.SCREEN_RANK, rank);
-                Log.i("TAOQI", "LP 555");
+                Log.i("TAOQI", "LP 默认的布局也添加到数据表");
                 //A TQ-SS {这里将默认的布局也添加到单层模式的数据表中去，和双层公用一个默认ilde，后续可以修改成分开的
                 if (dbInsertAndCheck(this, db, "single_workspaceScreens", null, values) < 0) {
                     throw new RuntimeException("Failed initialize screen table"

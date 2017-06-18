@@ -25,6 +25,7 @@ import android.graphics.Paint.FontMetrics;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,8 +99,8 @@ public class DeviceProfile {
     private int searchBarSpaceHeightPx;
 
     public DeviceProfile(Context context, InvariantDeviceProfile inv,
-            Point minSize, Point maxSize,
-            int width, int height, boolean isLandscape) {
+                         Point minSize, Point maxSize,
+                         int width, int height, boolean isLandscape) {
 
         this.inv = inv;
         this.isLandscape = isLandscape;
@@ -231,6 +232,7 @@ public class DeviceProfile {
         int allAppsCellWidthGap =
                 res.getDimensionPixelSize(R.dimen.all_apps_icon_width_gap);
         int availableAppsWidthPx = (recyclerViewWidth > 0) ? recyclerViewWidth : availableWidthPx;
+        Log.i("TAOQI", "DP 屏幕的宽度（除去左右边界）" + availableAppsWidthPx + " 屏幕的宽度 " + availableWidthPx + " 默认Icon大小 " + allAppsIconSizePx + " app的间隔 " + allAppsCellWidthGap);
         int numAppsCols = (availableAppsWidthPx - appsViewLeftMarginPx) /
                 (allAppsIconSizePx + allAppsCellWidthGap);
         int numPredictiveAppCols = Math.max(inv.minAllAppsPredictionColumns, numAppsCols);
@@ -238,7 +240,9 @@ public class DeviceProfile {
         allAppsNumPredictiveCols = numPredictiveAppCols;
     }
 
-    /** Returns the search bar top offset */
+    /**
+     * Returns the search bar top offset
+     */
     private int getSearchBarTopOffset() {
         if (isTablet && !isVerticalBarLayout()) {
             return 4 * edgeMarginPx;
@@ -247,7 +251,9 @@ public class DeviceProfile {
         }
     }
 
-    /** Returns the search bar bounds in the current orientation */
+    /**
+     * Returns the search bar bounds in the current orientation
+     */
     public Rect getSearchBarBounds(boolean isLayoutRtl) {
         Rect bounds = new Rect();
         if (isLandscape && transposeLayoutWithOrientation) {
@@ -274,13 +280,15 @@ public class DeviceProfile {
                 bounds.set(desiredWorkspaceLeftRightMarginPx - defaultWidgetPadding.left,
                         getSearchBarTopOffset(),
                         availableWidthPx - (desiredWorkspaceLeftRightMarginPx -
-                        defaultWidgetPadding.right), searchBarSpaceHeightPx);
+                                defaultWidgetPadding.right), searchBarSpaceHeightPx);
             }
         }
         return bounds;
     }
 
-    /** Returns the workspace padding in the specified orientation */
+    /**
+     * Returns the workspace padding in the specified orientation
+     */
     Rect getWorkspacePadding(boolean isLayoutRtl) {
         Rect searchBarBounds = getSearchBarBounds(isLayoutRtl);
         Rect padding = new Rect();
@@ -352,6 +360,7 @@ public class DeviceProfile {
     public static int calculateCellWidth(int width, int countX) {
         return width / countX;
     }
+
     public static int calculateCellHeight(int height, int countY) {
         return height / countY;
     }
@@ -407,6 +416,7 @@ public class DeviceProfile {
             targets.getLayoutParams().width = searchBarSpaceWidthPx;
         }
         searchBar.setLayoutParams(lp);
+        searchBar.setVisibility(View.GONE);
 
         // Layout the workspace
         PagedView workspace = (PagedView) launcher.findViewById(R.id.workspace);
@@ -414,7 +424,8 @@ public class DeviceProfile {
         lp.gravity = Gravity.CENTER;
         Rect padding = getWorkspacePadding(isLayoutRtl);
         workspace.setLayoutParams(lp);
-        workspace.setPadding(padding.left, padding.top, padding.right, padding.bottom);
+        Log.i("TAOQI", "TOP " + padding.top + " " + padding.bottom + " " + padding.left + " " + padding.right);
+        workspace.setPadding(padding.left, 0, padding.right, padding.bottom);
         workspace.setPageSpacing(getWorkspacePageSpacing(isLayoutRtl));
 
         // Layout the hotseat
@@ -472,7 +483,7 @@ public class DeviceProfile {
 
             int visibleChildCount = getVisibleChildCount(overviewMode);
             int totalItemWidth = visibleChildCount * overviewModeBarItemWidthPx;
-            int maxWidth = totalItemWidth + (visibleChildCount-1) * overviewModeBarSpacerWidthPx;
+            int maxWidth = totalItemWidth + (visibleChildCount - 1) * overviewModeBarSpacerWidthPx;
 
             lp.width = Math.min(availableWidthPx, maxWidth);
             lp.height = overviewButtonBarHeight;
@@ -480,7 +491,7 @@ public class DeviceProfile {
 
             if (lp.width > totalItemWidth && visibleChildCount > 1) {
                 // We have enough space. Lets add some margin too.
-                int margin = (lp.width - totalItemWidth) / (visibleChildCount-1);
+                int margin = (lp.width - totalItemWidth) / (visibleChildCount - 1);
                 View lastChild = null;
 
                 // Set margin of all visible children except the last visible child
