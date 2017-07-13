@@ -65,7 +65,7 @@ public class DeleteDropTarget extends ButtonDropTarget {
     void completeDrop(DragObject d) {
         ItemInfo item = (ItemInfo) d.dragInfo;
         if ((d.dragSource instanceof Workspace) || (d.dragSource instanceof Folder)) {
-            removeWorkspaceOrFolderItem(mLauncher, item, null);
+            removeWorkspaceOrFolderItem(mLauncher, item, null, "DeleteDropTaeget68");
         }
     }
 
@@ -74,9 +74,9 @@ public class DeleteDropTarget extends ButtonDropTarget {
      *
      * @return true if the item was removed.
      */
-    public static boolean removeWorkspaceOrFolderItem(Launcher launcher, ItemInfo item, View view) {
+    public static boolean removeWorkspaceOrFolderItem(Launcher launcher, ItemInfo item, View view, String s) {
         if (item instanceof ShortcutInfo) {
-            LauncherModel.deleteItemFromDatabase(launcher, item);
+            LauncherModel.deleteItemFromDatabase(launcher, item, "DeleteDropTaeget79 " + s);
         } else if (item instanceof FolderInfo) {
             FolderInfo folder = (FolderInfo) item;
             launcher.removeFolder(folder);
@@ -86,7 +86,7 @@ public class DeleteDropTarget extends ButtonDropTarget {
 
             // Remove the widget from the workspace
             launcher.removeAppWidget(widget);
-            LauncherModel.deleteItemFromDatabase(launcher, widget);
+            LauncherModel.deleteItemFromDatabase(launcher, widget, "DeleteDropTaeget89");
 
             final LauncherAppWidgetHost appWidgetHost = launcher.getAppWidgetHost();
 

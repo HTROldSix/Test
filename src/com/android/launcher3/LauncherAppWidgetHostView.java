@@ -24,6 +24,7 @@ package com.android.launcher3;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -66,17 +67,20 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView implements Touc
     }
 
     public void updateLastInflationOrientation() {
+        Log.i("TAOQI", "LAWHV updateLastInflationOrientation");
         mPreviousOrientation = mContext.getResources().getConfiguration().orientation;
     }
 
     @Override
     public void updateAppWidget(RemoteViews remoteViews) {
+        Log.i("TAOQI", "LAWHV updateAppWidget");
         // Store the orientation in which the widget was inflated
         updateLastInflationOrientation();
         super.updateAppWidget(remoteViews);
     }
 
     public boolean isReinflateRequired() {
+        Log.i("TAOQI", "LAWHV isReinflateRequired");
         // Re-inflate is required if the orientation has changed since last inflated.
         int orientation = mContext.getResources().getConfiguration().orientation;
         if (mPreviousOrientation != orientation) {
@@ -86,6 +90,7 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView implements Touc
     }
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        Log.i("TAOQI", "LAWHV onInterceptTouchEvent");
         if (LauncherLog.DEBUG_MOTION) {
             LauncherLog.d(TAG, "onInterceptTouchEvent: ev = " + ev);
         }
@@ -159,6 +164,7 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView implements Touc
 
     @Override
     public void cancelLongPress() {
+        Log.i("TAOQI", "LAWHV cancelLongPress");
         super.cancelLongPress();
         mLongPressHelper.cancelLongPress();
     }
@@ -179,6 +185,7 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView implements Touc
 
     @Override
     public void onTouchComplete() {
+        Log.i("TAOQI", "LAWHV onTouchComplete");
         if (!mLongPressHelper.hasPerformedLongPress()) {
             // If a long press has been performed, we don't want to clear the record of that since
             // we still may be receiving a touch up which we want to intercept

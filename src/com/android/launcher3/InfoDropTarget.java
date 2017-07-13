@@ -55,7 +55,9 @@ public class InfoDropTarget extends ButtonDropTarget {
             componentName = ((ShortcutInfo) info).intent.getComponent();
         } else if (info instanceof PendingAddItemInfo) {
             componentName = ((PendingAddItemInfo) info).componentName;
-        }
+        } else if (info instanceof LauncherAppWidgetInfo) {//A TQ-SS{加上widget的应用信息显示
+            componentName = ((LauncherAppWidgetInfo) info).providerName;
+        }//}
         final UserHandleCompat user;
         if (info instanceof ItemInfo) {
             user = ((ItemInfo) info).user;
@@ -71,7 +73,6 @@ public class InfoDropTarget extends ButtonDropTarget {
     @Override
     protected boolean supportsDrop(DragSource source, Object info) {
         boolean b = source.supportsAppInfoDropTarget() && supportsDrop(getContext(), info);
-        Log.i("TAOQI", "IDT b = " + b);
         return b;
     }
 

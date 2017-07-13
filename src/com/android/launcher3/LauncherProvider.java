@@ -81,7 +81,7 @@ public class LauncherProvider extends ContentProvider {
     public static final String AUTHORITY = ProviderConfig.AUTHORITY;
 
     static final String TABLE_FAVORITES = LauncherSettings.Favorites.TABLE_NAME;
-    static final String SINGLE_LAYOUT_TABLE_FAVORITES = LauncherSettings.Favorites.SINGLE_LAYOUT_TABLE_NAME;
+    static final String SINGLE_LAYOUT_TABLE_FAVORITES = LauncherSettings.Favorites.SINGLE_LAYOUT_TABLE_NAME;//A TQ-SS{新加单层的数据表}
     static final String TABLE_WORKSPACE_SCREENS = LauncherSettings.WorkspaceScreens.TABLE_NAME;
     static final String EMPTY_DATABASE_CREATED = "EMPTY_DATABASE_CREATED";
 
@@ -606,6 +606,7 @@ public class LauncherProvider extends ContentProvider {
                     "rank INTEGER NOT NULL DEFAULT 0," +
                     "options INTEGER NOT NULL DEFAULT 0" +
                     ");");
+            //A:TQ-SS {创建表
             db.execSQL("CREATE TABLE single_favorites (" +
                     "_id INTEGER PRIMARY KEY," +
                     "title TEXT," +
@@ -632,6 +633,7 @@ public class LauncherProvider extends ContentProvider {
                     "rank INTEGER NOT NULL DEFAULT 0," +
                     "options INTEGER NOT NULL DEFAULT 0" +
                     ");");
+            //}
             addWorkspacesTable(db);
 
             // Database was just created, so wipe any previous widgets
@@ -669,11 +671,13 @@ public class LauncherProvider extends ContentProvider {
                     LauncherSettings.WorkspaceScreens.SCREEN_RANK + " INTEGER," +
                     LauncherSettings.ChangeLogColumns.MODIFIED + " INTEGER NOT NULL DEFAULT 0" +
                     ");");
+            //A：TQ-SS {这里创建单层数据表
             db.execSQL("CREATE TABLE " + "single_workspaceScreens" + " (" +
                     LauncherSettings.WorkspaceScreens._ID + " INTEGER PRIMARY KEY," +
                     LauncherSettings.WorkspaceScreens.SCREEN_RANK + " INTEGER," +
                     LauncherSettings.ChangeLogColumns.MODIFIED + " INTEGER NOT NULL DEFAULT 0" +
                     ");");
+            //}
         }
 
         private void removeOrphanedItems(SQLiteDatabase db) {
@@ -858,9 +862,9 @@ public class LauncherProvider extends ContentProvider {
          */
         public void createEmptyDB(SQLiteDatabase db) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_FAVORITES);
-            db.execSQL("DROP TABLE IF EXISTS " + "single_favorites");
+            db.execSQL("DROP TABLE IF EXISTS " + "single_favorites");//A: TQ-SS
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_WORKSPACE_SCREENS);
-            db.execSQL("DROP TABLE IF EXISTS " + "single_workspaceScreens");
+            db.execSQL("DROP TABLE IF EXISTS " + "single_workspaceScreens");//A: TQ-SS
             onCreate(db);
         }
 

@@ -7,7 +7,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.UserManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
+
 import com.android.launcher3.R;
 import com.android.launcher3.compat.UserHandleCompat;
 import com.android.launcher3.util.Thunk;
@@ -72,6 +74,7 @@ public class UninstallDropTarget extends ButtonDropTarget {
     @Override
     public void onDrop(DragObject d) {
         // Differ item deletion
+        Log.i("TAOQI", "UDT onDrop " + (d.dragSource instanceof UninstallSource));
         if (d.dragSource instanceof UninstallSource) {
             ((UninstallSource) d.dragSource).deferCompleteDropAfterUninstallActivity();
         }
@@ -82,8 +85,9 @@ public class UninstallDropTarget extends ButtonDropTarget {
     void completeDrop(final DragObject d) {
         final Pair<ComponentName, Integer> componentInfo = getAppInfoFlags(d.dragInfo);
         final UserHandleCompat user = ((ItemInfo) d.dragInfo).user;
-        if (startUninstallActivity(mLauncher, d.dragInfo)) {
-
+        boolean b = startUninstallActivity(mLauncher, d.dragInfo);
+        Log.i("TAOQI", "UDT completeDrop b = " + b);
+        if (b) {
             final Runnable checkIfUninstallWasSuccess = new Runnable() {
                 @Override
                 public void run() {
@@ -106,7 +110,9 @@ public class UninstallDropTarget extends ButtonDropTarget {
                 componentInfo.first, componentInfo.second, user);
     }
 
-    @Thunk void sendUninstallResult(DragSource target, boolean result) {
+    @Thunk
+    void sendUninstallResult(DragSource target, boolean result) {
+        Log.i("TAOQI","UDT sendUninstallResult " + (target instanceof Workspace) + " " + (target instanceof Folder));
         if (target instanceof UninstallSource) {
             ((UninstallSource) target).onUninstallActivityReturned(result);
         }
@@ -119,6 +125,7 @@ public class UninstallDropTarget extends ButtonDropTarget {
 
         /**
          * A pending uninstall operation was complete.
+         *
          * @param result true if uninstall was successful, false otherwise.
          */
         void onUninstallActivityReturned(boolean result);

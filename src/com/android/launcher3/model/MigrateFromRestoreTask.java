@@ -162,6 +162,7 @@ public class MigrateFromRestoreTask {
             if (DEBUG) {
                 Log.d(TAG, "Removing items: " + TextUtils.join(", ", mEntryToRemove));
             }
+            Log.i("TAOQI","MFRT execute");
             mContext.getContentResolver().delete(LauncherSettings.Favorites.CONTENT_URI,
                     Utilities.createDbSelectionQuery(
                             LauncherSettings.Favorites._ID, mEntryToRemove), null);

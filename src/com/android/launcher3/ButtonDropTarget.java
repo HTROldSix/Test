@@ -23,6 +23,7 @@ import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.res.ColorStateList;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
@@ -31,6 +32,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -47,22 +49,28 @@ public abstract class ButtonDropTarget extends TextView
         implements DropTarget, DragController.DragListener, OnClickListener {
 
     private static int DRAG_VIEW_DROP_DURATION = 285;
+    public static boolean supportsUninstallDropTarget = true;
 
     protected Launcher mLauncher;
     private int mBottomDragPadding;
     protected SearchDropTargetBar mSearchDropTargetBar;
 
-    /** Whether this drop target is active for the current drag */
+    /**
+     * Whether this drop target is active for the current drag
+     */
     protected boolean mActive;
 
-    /** The paint applied to the drag view on hover */
+    /**
+     * The paint applied to the drag view on hover
+     */
     protected int mHoverColor = 0;
 
     protected ColorStateList mOriginalTextColor;
     protected Drawable mDrawable;
 
     private AnimatorSet mCurrentColorAnim;
-    @Thunk ColorMatrix mSrcFilter, mDstFilter, mCurrentFilter;
+    @Thunk
+    ColorMatrix mSrcFilter, mDstFilter, mCurrentFilter;
 
 
     public ButtonDropTarget(Context context, AttributeSet attrs) {
@@ -108,7 +116,8 @@ public abstract class ButtonDropTarget extends TextView
     }
 
     @Override
-    public void onFlingToDelete(DragObject d, PointF vec) { }
+    public void onFlingToDelete(DragObject d, PointF vec) {
+    }
 
     @Override
     public final void onDragEnter(DragObject d) {
@@ -184,9 +193,12 @@ public abstract class ButtonDropTarget extends TextView
         }
     }
 
-	@Override
+    @Override
     public final void onDragStart(DragSource source, Object info, int dragAction) {
+        Log.i("TAOQI", "BDT onDragStart方法");
         mActive = supportsDrop(source, info);
+        Log.i("TAOQI", "BDT onDragStart方法" + (this instanceof InfoDropTarget) + (this instanceof UninstallDropTarget) + this);
+        supportsUninstallDropTarget = (this instanceof UninstallDropTarget) && mActive;
         mDrawable.setColorFilter(null);
         if (mCurrentColorAnim != null) {
             mCurrentColorAnim.cancel();
@@ -198,6 +210,7 @@ public abstract class ButtonDropTarget extends TextView
 
     @Override
     public final boolean acceptDrop(DragObject dragObject) {
+        Log.i("TAOQI", "BDT acceptDrop");
         return supportsDrop(dragObject.dragSource, dragObject.dragInfo);
     }
 
@@ -218,6 +231,7 @@ public abstract class ButtonDropTarget extends TextView
      */
     @Override
     public void onDrop(final DragObject d) {
+        Log.i("TAOQI", "BDT onDrop");
         final DragLayer dragLayer = mLauncher.getDragLayer();
         final Rect from = new Rect();
         dragLayer.getViewRectRelativeToSelf(d.dragView, from);
@@ -232,6 +246,8 @@ public abstract class ButtonDropTarget extends TextView
         Runnable onAnimationEndRunnable = new Runnable() {
             @Override
             public void run() {
+                Log.i("TAOQI", "BDT completeDrop");
+                //这个方法是从数据库中删除数据
                 completeDrop(d);
                 mSearchDropTargetBar.onDragEnd();
                 mLauncher.exitSpringLoadedDragModeDelayed(true, 0, null);
@@ -244,9 +260,11 @@ public abstract class ButtonDropTarget extends TextView
     }
 
     @Override
-    public void prepareAccessibilityDrop() { }
+    public void prepareAccessibilityDrop() {
+    }
 
-    @Thunk abstract void completeDrop(DragObject d);
+    @Thunk
+    abstract void completeDrop(DragObject d);
 
     @Override
     public void getHitRectRelativeToDragLayer(android.graphics.Rect outRect) {
@@ -280,7 +298,7 @@ public abstract class ButtonDropTarget extends TextView
         }
 
         final int top = to.top + (getMeasuredHeight() - height) / 2;
-        final int bottom = top +  height;
+        final int bottom = top + height;
 
         to.set(left, top, right, bottom);
 
@@ -308,7 +326,7 @@ public abstract class ButtonDropTarget extends TextView
     @Override
     public void onClick(View v) {
         LauncherAppState.getInstance().getAccessibilityDelegate()
-            .handleAccessibleDrop(this, null, getAccessibilityDropConfirmation());
+                .handleAccessibleDrop(this, null, getAccessibilityDropConfirmation());
     }
 
     public int getTextColor() {

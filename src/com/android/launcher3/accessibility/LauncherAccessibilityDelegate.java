@@ -134,7 +134,7 @@ public class LauncherAccessibilityDelegate extends AccessibilityDelegate impleme
 
     public boolean performAction(final View host, final ItemInfo item, int action) {
         if (action == REMOVE) {
-            if (DeleteDropTarget.removeWorkspaceOrFolderItem(mLauncher, item, host)) {
+            if (DeleteDropTarget.removeWorkspaceOrFolderItem(mLauncher, item, host, "performAction 135")) {
                 announceConfirmation(R.string.item_removed);
                 return true;
             }

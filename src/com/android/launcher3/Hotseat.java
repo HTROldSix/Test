@@ -145,7 +145,7 @@ public class Hotseat extends FrameLayout
         int y = getCellYFromOrder(mAllAppsButtonRank);
         CellLayout.LayoutParams lp = new CellLayout.LayoutParams(x, y, 1, 1);
         lp.canReorder = false;
-        //M SS-TQ{
+        //M TQ-SS{这里判断是否显示allapp按钮
         //mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);
         if (!LauncherAppState.isDisableAllApps()) {
             mContent.addViewToCellLayout(allAppsButton, -1, allAppsButton.getId(), lp, true);

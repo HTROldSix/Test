@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/menu_list"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/menu_remove_icon"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_remove_launcher"
+        android:onClick="removeIcon"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:text="@string/delete_target_label" />
+
+    <TextView
+        android:id="@+id/menu_application_information"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_info_launcher"
+        android:onClick="displayApplicationInformation"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:text="@string/info_target_label" />
+
+    <TextView
+        android:id="@+id/menu_uninstall_app"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_uninstall_launcher"
+        android:onClick="uninstallApp"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:text="@string/delete_target_uninstall_label"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/menu_widget_resize"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_menu_widget_resize"
+        android:onClick="widgetResize"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:text="@string/action_resize"
+        android:visibility="gone" />
+</LinearLayout>

@@ -10,6 +10,7 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -213,6 +214,7 @@ public class AppWidgetResizeFrame extends FrameLayout {
             lp.height = mBaselineHeight + mDeltaY;
         }
 
+        Log.i("TAOQI", "AWRF visualizeResizeForDelta");
         resizeWidgetIfNeeded(onDismiss);
         requestLayout();
     }
@@ -221,6 +223,7 @@ public class AppWidgetResizeFrame extends FrameLayout {
      *  Based on the current deltas, we determine if and how to resize the widget.
      */
     private void resizeWidgetIfNeeded(boolean onDismiss) {
+        Log.i("TAOQI", "AWRF resizeWidgetIfNeeded");
         int xThreshold = mCellLayout.getCellWidth() + mCellLayout.getWidthGap();
         int yThreshold = mCellLayout.getCellHeight() + mCellLayout.getHeightGap();
 
@@ -372,6 +375,7 @@ public class AppWidgetResizeFrame extends FrameLayout {
      * to LauncherModel and animate the resize frame.
      */
     public void commitResize() {
+        Log.i("TAOQI", "AWRF commitResize");
         resizeWidgetIfNeeded(true);
         requestLayout();
     }
@@ -394,6 +398,7 @@ public class AppWidgetResizeFrame extends FrameLayout {
     }
 
     public void snapToWidget(boolean animate) {
+        Log.i("TAOQI", "AWRF animate = " + animate);
         final DragLayer.LayoutParams lp = (DragLayer.LayoutParams) getLayoutParams();
         int newWidth = mWidgetView.getWidth() + 2 * mBackgroundPadding
                 - mWidgetPadding.left - mWidgetPadding.right;

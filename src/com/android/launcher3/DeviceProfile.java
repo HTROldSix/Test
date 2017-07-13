@@ -416,7 +416,7 @@ public class DeviceProfile {
             targets.getLayoutParams().width = searchBarSpaceWidthPx;
         }
         searchBar.setLayoutParams(lp);
-        searchBar.setVisibility(View.GONE);
+        searchBar.setVisibility(View.GONE);//A: TQ-SS {搜索栏设置隐藏
 
         // Layout the workspace
         PagedView workspace = (PagedView) launcher.findViewById(R.id.workspace);
@@ -425,7 +425,7 @@ public class DeviceProfile {
         Rect padding = getWorkspacePadding(isLayoutRtl);
         workspace.setLayoutParams(lp);
         Log.i("TAOQI", "TOP " + padding.top + " " + padding.bottom + " " + padding.left + " " + padding.right);
-        workspace.setPadding(padding.left, 0, padding.right, padding.bottom);
+        workspace.setPadding(padding.left, 0, padding.right, padding.bottom);//M: TQ-SS {修改距离顶部高度
         workspace.setPageSpacing(getWorkspacePageSpacing(isLayoutRtl));
 
         // Layout the hotseat

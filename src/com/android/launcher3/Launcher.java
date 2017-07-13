@@ -35,7 +35,6 @@ import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.SearchManager;
-import android.app.Service;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
@@ -70,10 +69,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PowerManager;
 import android.os.StrictMode;
 import android.os.SystemClock;
-import android.os.Trace;
 import android.os.UserHandle;
 import android.text.Selection;
 import android.text.SpannableStringBuilder;
@@ -86,6 +83,7 @@ import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
@@ -98,16 +96,22 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Advanceable;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.PagedView.PageSwitchListener;
+import com.android.launcher3.backup.BackupProtos;
 import com.android.launcher3.compat.PackageInstallerCompat;
 import com.android.launcher3.allapps.AllAppsContainerView;
 import com.android.launcher3.compat.AppWidgetManagerCompat;
@@ -1205,6 +1209,7 @@ public class Launcher extends Activity
                         (System.currentTimeMillis() - startTimeCallbacks));
             }
         }
+        Log.i("TAOQI", "L onResume");
         if (mOnResumeCallbacks.size() > 0) {
             for (int i = 0; i < mOnResumeCallbacks.size(); i++) {
                 mOnResumeCallbacks.get(i).run();
@@ -3528,7 +3533,7 @@ public class Launcher extends Activity
         CellLayout.CellInfo longClickCellInfo = null;
         View itemUnderLongClick = null;
         if (v.getTag() instanceof ItemInfo) {
-            Log.i("TAOQI","L 长按");
+            Log.i("TAOQI", "L 长按");
             ItemInfo info = (ItemInfo) v.getTag();
             longClickCellInfo = new CellLayout.CellInfo(v, info);
             itemUnderLongClick = longClickCellInfo.cell;
@@ -3540,7 +3545,7 @@ public class Launcher extends Activity
         final boolean inHotseat = isHotseatLayout(v);
         if (!mDragController.isDragging()) {
             if (itemUnderLongClick == null) {
-                Log.i("TAOQI","L 长按空白处 " + mWorkspace.isInOverviewMode());
+                Log.i("TAOQI", "L 长按空白处 " + mWorkspace.isInOverviewMode());
                 // User long pressed on empty space
                 mWorkspace.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
                         HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
@@ -3554,15 +3559,102 @@ public class Launcher extends Activity
                         mHotseat.getOrderInHotseat(
                                 longClickCellInfo.cellX,
                                 longClickCellInfo.cellY));
-                Log.i("TAOQI","L " + (itemUnderLongClick instanceof Folder));
                 if (!(itemUnderLongClick instanceof Folder || isAllAppsButton)) {
                     // User long pressed on an item
+                    //A TQ-SS {把点击的icon这个view保存下来，如果删除需要设置view不可见
+                    iconView = longClickCellInfo.cell;
+                    //}
                     mWorkspace.startDrag(longClickCellInfo);
                 }
             }
         }
         return true;
     }
+
+    //A TQ-SS {弹出框的添加以及对应的 移除，应用信息，卸载 三种点击事件监听
+    void showPopupWindow(View view, long container, int cellX, int cellY, int spanX, int spanY, boolean resizeMode) {
+
+        // 一个自定义的布局，作为显示的内容
+        View contentView = LayoutInflater.from(this).inflate(
+                R.layout.menu, null);
+
+        popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        if(LauncherAppState.isDisableAllApps){
+            contentView.findViewById(R.id.menu_remove_icon).setVisibility(View.GONE);
+        }
+        if(view instanceof FolderIcon){
+            contentView.findViewById(R.id.menu_application_information).setVisibility(View.GONE);
+        }
+        if (ButtonDropTarget.supportsUninstallDropTarget) {
+            contentView.findViewById(R.id.menu_uninstall_app).setVisibility(View.VISIBLE);
+        }
+        if (resizeMode) {
+            contentView.findViewById(R.id.menu_widget_resize).setVisibility(View.VISIBLE);
+        }
+        popupWindow.getContentView().measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        popupWindow.setTouchable(true);
+
+        popupWindow.setTouchInterceptor(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // 这里如果返回true的话，touch事件将被拦截
+                // 拦截后 PopupWindow的onTouchEvent不被调用，这样点击外部区域无法dismiss
+                return false;
+            }
+        });
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        view.setVisibility(View.INVISIBLE);
+        int x = 0;
+        int y = 0;
+        if (container == -101) {
+            x = cellX > 1 ? location[0] - popupWindow.getContentView().getMeasuredWidth() + view.getWidth() - 10 : location[0] + 10;
+            y = location[1] - popupWindow.getContentView().getMeasuredHeight() + 15;
+        } else {
+            x = cellX > 1 ? location[0] - popupWindow.getContentView().getMeasuredWidth() + view.getWidth() - 20 : location[0] + 20;
+            y = cellY > 2 ? location[1] - popupWindow.getContentView().getMeasuredHeight() + 15 : location[1] + view.getHeight() - 40;
+        }
+        Log.i("TAOQI", "L " + view.getWidth() + " " + view.getHeight() + " " + popupWindow.getContentView().getMeasuredHeight() + " " + popupWindow.getContentView().getMeasuredWidth() + " " + location[0] + " " + location[1]);
+        popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, x, y);
+    }
+
+    PopupWindow popupWindow;
+    DragObject d;
+    View iconView;
+    CellLayout dropTargetLayout;
+
+    void setDragObject(DragObject d, CellLayout dropTargetLayout) {
+        this.d = d;
+        this.dropTargetLayout = dropTargetLayout;
+    }
+
+    public void uninstallApp(View v) {
+        popupWindow.dismiss();
+        if (d != null)
+            UninstallDropTarget.startUninstallActivity(this, d.dragInfo);
+    }
+
+    public void removeIcon(View v) {
+        popupWindow.dismiss();
+        if (d != null) {
+            iconView.setVisibility(View.INVISIBLE);
+            DeleteDropTarget.removeWorkspaceOrFolderItem(this, (ItemInfo) d.dragInfo, null, "L 3613");
+        }
+    }
+
+    public void displayApplicationInformation(View v) {
+        popupWindow.dismiss();
+        if (d != null) {
+            InfoDropTarget.startDetailsActivityForInfo(d.dragInfo, this);
+        }
+    }
+
+    public void widgetResize(View v) {
+        popupWindow.dismiss();
+        getDragLayer().addResizeFrame((ItemInfo) d.dragInfo, (LauncherAppWidgetHostView) iconView, dropTargetLayout);
+    }
+    //}
 
     boolean isHotseatLayout(View layout) {
         return mHotseat != null && layout != null &&
@@ -4422,7 +4514,7 @@ public class Launcher extends Activity
                             + " belongs to component " + item.providerName
                             + ", as the povider is null");
                 }
-                LauncherModel.deleteItemFromDatabase(this, item);
+                LauncherModel.deleteItemFromDatabase(this, item, "launcher4455");
                 return;
             }
 
@@ -4451,7 +4543,7 @@ public class Launcher extends Activity
                                 + " belongs to component " + item.providerName
                                 + ", as the launcher is unable to bing a new widget id");
                     }
-                    LauncherModel.deleteItemFromDatabase(this, item);
+                    LauncherModel.deleteItemFromDatabase(this, item, "launcher4484");
                     return;
                 }
 

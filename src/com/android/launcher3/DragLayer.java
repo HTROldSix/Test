@@ -837,6 +837,7 @@ public class DragLayer extends InsettableFrameLayout {
                 if (onCompleteRunnable != null) {
                     onCompleteRunnable.run();
                 }
+                Log.i("TAOQI","DL  onAnimationEnd 这个是结束拖拽动画，移除拖拽的小图标");
                 switch (animationEndStyle) {
                 case ANIMATION_END_DISAPPEAR:
                     clearAnimatedView();

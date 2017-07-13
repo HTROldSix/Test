@@ -408,7 +408,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
         // number of items.
         for (ShortcutInfo item : overflow) {
             mInfo.remove(item);
-            LauncherModel.deleteItemFromDatabase(mLauncher, item);
+            LauncherModel.deleteItemFromDatabase(mLauncher, item, "Folder411");
         }
 
         DragLayer.LayoutParams lp = (DragLayer.LayoutParams) getLayoutParams();
@@ -942,6 +942,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
 
     @Override
     public void onUninstallActivityReturned(boolean success) {
+        Log.i("TAOQI","F onUninstallActivityReturned " + success);
         mDeferDropAfterUninstall = false;
         mUninstallSuccessful = success;
         if (mDeferredAction != null) {
@@ -1197,7 +1198,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
                 }
                 if (getItemCount() <= 1) {
                     // Remove the folder
-                    LauncherModel.deleteItemFromDatabase(mLauncher, mInfo);
+                    LauncherModel.deleteItemFromDatabase(mLauncher, mInfo, "Folder1200");
                     if (cellLayout != null) {
                         // b/12446428 -- sometimes the cell layout has already gone away?
                         cellLayout.removeView(mFolderIcon);

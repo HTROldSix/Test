@@ -1178,6 +1178,7 @@ public class LauncherModel extends BroadcastReceiver
      */
     static void deletePackageFromDatabase(Context context, final String pn,
                                           final UserHandleCompat user) {
+        Log.i("TAOQI","LM deletePackageFromDatabase方法");
         deleteItemsFromDatabase(context, getItemsByPackageName(pn, user));
     }
 
@@ -1187,9 +1188,10 @@ public class LauncherModel extends BroadcastReceiver
      * @param context
      * @param item
      */
-    public static void deleteItemFromDatabase(Context context, final ItemInfo item) {
+    public static void deleteItemFromDatabase(Context context, final ItemInfo item, String s) {
         ArrayList<ItemInfo> items = new ArrayList<ItemInfo>();
         items.add(item);
+        Log.i("TAOQI", "LM public deleteItemFromDatabase " + s);
         deleteItemsFromDatabase(context, items);
     }
 
@@ -1200,6 +1202,7 @@ public class LauncherModel extends BroadcastReceiver
      * @param item
      */
     static void deleteItemsFromDatabase(Context context, final ArrayList<? extends ItemInfo> items) {
+        Log.i("TAOQI","LM deleteItemsFromDatabase方法");
         final ContentResolver cr = context.getContentResolver();
         Runnable r = new Runnable() {
             public void run() {
