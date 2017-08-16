@@ -140,7 +140,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
     View mContentWrapper;
     ExtendedEditText mFolderName;
 
-    private View mFooter;
+    private View mFooter,mFolderNameLv;
     private int mFooterHeight;
 
     // Cell ranks used for drag and drop
@@ -188,6 +188,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
      */
     public Folder(Context context, AttributeSet attrs) {
         super(context, attrs);
+        Log.i("TAOQI", "FC Folder ");
         setAlwaysDrawnWithCacheEnabled(false);
         mInputMethodManager = (InputMethodManager)
                 getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -213,6 +214,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        Log.i("TAOQI", "FC onFinishInflate ");
         mContentWrapper = findViewById(R.id.folder_content_wrapper);
         mContent = (FolderPagedView) findViewById(R.id.folder_content);
         mContent.setFolder(this);
@@ -236,12 +238,15 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
                 InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
         mFooter = findViewById(R.id.folder_footer);
+        mFolderNameLv = findViewById(R.id.lv_folder_name);
 
         // We find out how tall footer wants to be (it is set to wrap_content), so that
         // we can allocate the appropriate amount of space for it.
         int measureSpec = MeasureSpec.UNSPECIFIED;
         mFooter.measure(measureSpec, measureSpec);
+        Log.i("TAOQI", "FC Folder measureSpec " + measureSpec);
         mFooterHeight = mFooter.getMeasuredHeight();
+        Log.i("TAOQI", "FC Folder mFooterHeight " + mFooterHeight);
     }
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -412,6 +417,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
         }
 
         DragLayer.LayoutParams lp = (DragLayer.LayoutParams) getLayoutParams();
+        Log.i("TAOQI", "FC bind " + lp);
         if (lp == null) {
             lp = new DragLayer.LayoutParams(0, 0);
             lp.customPosition = true;
@@ -447,6 +453,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
      */
     @SuppressLint("InflateParams")
     static Folder fromXml(Launcher launcher) {
+        Log.i("TAOQI", "FC fromXml ");
         return (Folder) launcher.getLayoutInflater().inflate(R.layout.user_folder, null);
     }
 
@@ -456,6 +463,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
      */
     private void positionAndSizeAsIcon() {
         if (!(getParent() instanceof DragLayer)) return;
+        Log.i("TAOQI", "FC positionAndSizeAsIcon ");
         setScaleX(0.8f);
         setScaleY(0.8f);
         setAlpha(0f);
@@ -463,6 +471,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
     }
 
     private void prepareReveal() {
+        Log.i("TAOQI", "FC prepareReveal ");
         setScaleX(1f);
         setScaleY(1f);
         setAlpha(1f);
@@ -598,6 +607,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
         if (mContent.getPageCount() > 1 && !mInfo.hasOption(FolderInfo.FLAG_MULTI_PAGE_ANIMATION)) {
             int footerWidth = mContent.getDesiredWidth()
                     - mFooter.getPaddingLeft() - mFooter.getPaddingRight();
+            Log.i("TAOQI", "FC Folder footerWidth " + footerWidth);
 
             float textWidth = mFolderName.getPaint().measureText(mFolderName.getText().toString());
             float translation = (footerWidth - textWidth) / 2;
@@ -807,11 +817,13 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
 
     OnAlarmListener mOnExitAlarmListener = new OnAlarmListener() {
         public void onAlarm(Alarm alarm) {
+            Log.i("TAOQI", "FC completeDragExit");
             completeDragExit();
         }
     };
 
     public void completeDragExit() {
+        Log.i("TAOQI", "FC completeDragExit ()");
         if (mInfo.opened) {
             mLauncher.closeFolder();
             mRearrangeOnClose = true;
@@ -942,7 +954,6 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
 
     @Override
     public void onUninstallActivityReturned(boolean success) {
-        Log.i("TAOQI","F onUninstallActivityReturned " + success);
         mDeferDropAfterUninstall = false;
         mUninstallSuccessful = success;
         if (mDeferredAction != null) {
@@ -1024,6 +1035,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
         int width = getPaddingLeft() + getPaddingRight() + mContent.getDesiredWidth();
         int height = getFolderHeight();
 
+        Log.i("TAOQI", "FC Folder height = " + height);
         float scale = parent.getDescendantRectRelativeToSelf(mFolderIcon, sTempRect);
 
         DeviceProfile grid = mLauncher.getDeviceProfile();
@@ -1066,6 +1078,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
         lp.height = height;
         lp.x = left;
         lp.y = top;
+        Log.i("TAOQI", "FC Folder centerAboutIcon " + width + " " + top);
     }
 
     float getPivotXForIconAnimation() {
@@ -1084,6 +1097,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
                 mFooterHeight;
         int height = Math.min(maxContentAreaHeight,
                 mContent.getDesiredHeight());
+        Log.i("TAOQI", "FC Folder maxContentAreaHeight " + maxContentAreaHeight + " " + height);
         return Math.max(height, MIN_CONTENT_DIMEN);
     }
 
@@ -1092,7 +1106,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
     }
 
     private int getFolderHeight() {
-        return getFolderHeight(getContentAreaHeight());
+        return 1150;//getFolderHeight(getContentAreaHeight());//M: TAOQI  修改默认folder边框的大小
     }
 
     private int getFolderHeight(int contentAreaHeight) {
@@ -1108,6 +1122,7 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
 
         mContent.setFixedSize(contentWidth, contentHeight);
         mContentWrapper.measure(contentAreaWidthSpec, contentAreaHeightSpec);
+        Log.i("TAOQI", "FC Folder " + contentWidth + " " + contentHeight + " " + contentAreaWidthSpec + " " + contentAreaHeightSpec);
 
         if (mContent.getChildCount() > 0) {
             int cellIconGap = (mContent.getPageAt(0).getCellWidth()
@@ -1117,11 +1132,12 @@ public class Folder extends LinearLayout implements DragSource, View.OnClickList
                     mContent.getPaddingRight() + cellIconGap,
                     mFooter.getPaddingBottom());
         }
+        mFolderNameLv.measure(contentAreaWidthSpec,100);
         mFooter.measure(contentAreaWidthSpec,
                 MeasureSpec.makeMeasureSpec(mFooterHeight, MeasureSpec.EXACTLY));
 
-        int folderWidth = getPaddingLeft() + getPaddingRight() + contentWidth;
-        int folderHeight = getFolderHeight(contentHeight);
+        int folderWidth = 880;//M : TAOQI 强制修改view大小
+        int folderHeight = 1150;
         setMeasuredDimension(folderWidth, folderHeight);
     }
 

@@ -35,6 +35,7 @@ import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.app.WallpaperManager;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
@@ -60,6 +61,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -72,6 +74,10 @@ import android.os.Message;
 import android.os.StrictMode;
 import android.os.SystemClock;
 import android.os.UserHandle;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.text.Selection;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -1553,6 +1559,12 @@ public class Launcher extends Activity
                 savedState.getSerializable(RUNTIME_STATE_VIEW_IDS);
     }
 
+    private void setWPHVisibility(int visibility) {
+        mWorkspace.setVisibility(visibility);
+        mPageIndicators.setVisibility(visibility);
+        mHotseat.setVisibility(visibility);
+    }
+
     /**
      * Finds all the views we need and configure them properly.
      */
@@ -2114,6 +2126,7 @@ public class Launcher extends Activity
 
     @Override
     protected void onNewIntent(Intent intent) {
+        Log.i("TAOQI", "FC L onNewIntent ()");
         long startTime = 0;
         if (DEBUG_RESUME_TIME) {
             startTime = System.currentTimeMillis();
@@ -2213,6 +2226,7 @@ public class Launcher extends Activity
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Log.i("TAOQI", "FC L onSaveInstanceState ()");
         if (mWorkspace.getChildCount() > 0) {
             outState.putInt(RUNTIME_STATE_CURRENT_SCREEN,
                     mWorkspace.getCurrentPageOffsetFromCustomContent());
@@ -2443,6 +2457,7 @@ public class Launcher extends Activity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        Log.i("TAOQI", "FC L onPrepareOptionsMenu ()");
         if (!isOnCustomContent()) {
             // Close any open folders
             closeFolder();
@@ -2551,6 +2566,7 @@ public class Launcher extends Activity
     }
 
     protected void moveToCustomContentScreen(boolean animate) {
+        Log.i("TAOQI","FC L moveToCustomContentScreen ()");
         // Close any folders that may be open.
         closeFolder();
         mWorkspace.moveToCustomContentScreen(animate);
@@ -2718,6 +2734,7 @@ public class Launcher extends Activity
 
     @Override
     public void onBackPressed() {
+        Log.i("TAOQI","FC L onBackPressed ()");
         if (LauncherLog.DEBUG) {
             LauncherLog.d(TAG, "Back key pressed, mState = " + mState
                     + ", mOnResumeState = " + mOnResumeState);
@@ -2814,6 +2831,7 @@ public class Launcher extends Activity
         }
 
         if (v instanceof Workspace) {
+            Log.d("TAOQI", "FC L instanceof Workspace");
             if (mWorkspace.isInOverviewMode()) {
                 showWorkspace(true);
             }
@@ -2821,6 +2839,7 @@ public class Launcher extends Activity
         }
 
         if (v instanceof CellLayout) {
+            Log.d("TAOQI", "FC L instanceof CellLayout");
             if (mWorkspace.isInOverviewMode()) {
                 showWorkspace(mWorkspace.indexOfChild(v), true);
             }
@@ -2830,6 +2849,7 @@ public class Launcher extends Activity
         if (tag instanceof ShortcutInfo) {
             onClickAppShortcut(v);
         } else if (tag instanceof FolderInfo) {
+            Log.d("TAOQI", "FC L instanceof FolderInfo");
             if (v instanceof FolderIcon) {
                 onClickFolderIcon(v);
             }
@@ -3032,6 +3052,7 @@ public class Launcher extends Activity
      * @param v The view that was clicked. Must be an instance of {@link FolderIcon}.
      */
     protected void onClickFolderIcon(View v) {
+        Log.i("TAOQI","FC L onClickFolderIcon ()");
         if (LOGD) Log.d(TAG, "onClickFolder");
         if (!(v instanceof FolderIcon)) {
             throw new IllegalArgumentException("Input must be a FolderIcon");
@@ -3427,7 +3448,11 @@ public class Launcher extends Activity
      * @param folderInfo The FolderInfo describing the folder to open.
      */
     public void openFolder(FolderIcon folderIcon) {
+        Log.i("TAOQI","FC L openFolder ()");
+        Bitmap bm = blur(getWallpaperBg());
         Folder folder = folderIcon.getFolder();
+        mLauncherView.setBackground(new BitmapDrawable(bm));
+        setWPHVisibility(View.INVISIBLE);
         Folder openFolder = mWorkspace != null ? mWorkspace.getOpenFolder() : null;
         if (openFolder != null && openFolder != folder) {
             // Close any open folder before opening a folder.
@@ -3459,7 +3484,75 @@ public class Launcher extends Activity
         getDragLayer().sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED);
     }
 
+    public Bitmap blur(Bitmap image) {
+        // 计算图片缩小后的长宽
+        int width = Math.round(image.getWidth() * 0.4f);
+        int height = Math.round(image.getHeight() * 0.4f);
+        // 将缩小后的图片做为预渲染的图片。
+        Bitmap inputBitmap = Bitmap.createScaledBitmap(image, width, height, false);
+        // 创建一张渲染后的输出图片。
+        Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap);
+        // 创建RenderScript内核对象
+        RenderScript rs = RenderScript.create(this);
+        // 创建一个模糊效果的RenderScript的工具对象
+        ScriptIntrinsicBlur blurScript = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+        // 由于RenderScript并没有使用VM来分配内存,所以需要使用Allocation类来创建和分配内存空间。
+        // 创建Allocation对象的时候其实内存是空的,需要使用copyTo()将数据填充进去。
+        Allocation tmpIn = Allocation.createFromBitmap(rs, inputBitmap);
+        Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
+        // 设置渲染的模糊程度, 25f是最大模糊度
+        blurScript.setRadius(25f);
+        // 设置blurScript对象的输入内存
+        blurScript.setInput(tmpIn);
+        // 将输出数据保存到输出内存中
+        blurScript.forEach(tmpOut);
+        // 将数据填充到Allocation中
+        tmpOut.copyTo(outputBitmap);
+        return outputBitmap;
+    }
+
+    public Bitmap getWallpaperBg() {
+        // 获取壁纸管理器
+        WallpaperManager wallpaperManager = WallpaperManager
+                .getInstance(this);
+        // 获取当前壁纸
+        Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+        // 将Drawable,转成Bitmap
+        Bitmap bm = ((BitmapDrawable) wallpaperDrawable).getBitmap();
+
+        // 需要详细说明一下，mScreenCount、getCurrentWorkspaceScreen()、mScreenWidth、mScreenHeight分别
+        //对应于Launcher中的桌面屏幕总数、当前屏幕下标、屏幕宽度、屏幕高度.等下拿Demo的哥们稍微要注意一下
+        /*float step = 0;
+        // 计算出屏幕的偏移量
+        step = (bm.getWidth() - LauncherPreferenceModel.mScreenWidth)
+                / (LauncherPreferenceModel.mScreenCount - 1);
+        // 截取相应屏幕的Bitmap
+        Bitmap pbm = Bitmap.createBitmap(bm, (int) (getCurrentWorkspaceScreen() * step), 0,
+                (int) (LauncherPreferenceModel.mScreenWidth),
+                (int) (LauncherPreferenceModel.mScreenHeight));*/
+        return bm;
+    }
+
+    public Bitmap getShot() {
+        // 获取windows中最顶层的view
+        View view = this.getWindow().getDecorView();
+        view.buildDrawingCache();
+        Display display = this.getWindowManager().getDefaultDisplay();
+        // 获取屏幕宽和高
+        int widths = display.getWidth();
+        int heights = display.getHeight();
+        // 允许当前窗口保存缓存信息
+        view.setDrawingCacheEnabled(true);
+        Bitmap bmp = Bitmap.createBitmap(view.getDrawingCache(), 0, 0, 1080, 1920);
+        // 销毁缓存信息
+        view.destroyDrawingCache();
+        return bmp;
+    }
+
     public void closeFolder() {
+        Log.i("TAOQI","FC L closeFolder ()");
+        mLauncherView.setBackground(null);
+        setWPHVisibility(View.VISIBLE);
         Folder folder = mWorkspace != null ? mWorkspace.getOpenFolder() : null;
         if (folder != null) {
             if (folder.isEditingName()) {
@@ -3579,10 +3672,10 @@ public class Launcher extends Activity
                 R.layout.menu, null);
 
         popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        if(LauncherAppState.isDisableAllApps){
+        if (LauncherAppState.isDisableAllApps) {
             contentView.findViewById(R.id.menu_remove_icon).setVisibility(View.GONE);
         }
-        if(view instanceof FolderIcon){
+        if (view instanceof FolderIcon) {
             contentView.findViewById(R.id.menu_application_information).setVisibility(View.GONE);
         }
         if (ButtonDropTarget.supportsUninstallDropTarget) {
